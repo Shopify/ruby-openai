@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.4.0] - 2026-06-26
+
 ### Added
 
 - Add public support, end-of-life, and migration documentation.
 - Add clearer issue template labels and bug report version fields.
+- Support headers when making requests and not just when creating clients - thanks to [@dirceu](https://github.com/dirceu) for the excellent PR!
 
 ## [8.3.0] - 2025-08-29
 
