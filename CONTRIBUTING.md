@@ -1,8 +1,6 @@
 ## Contributing
 
-Bug reports, feature requests, and pull requests are welcome on GitHub at <https://github.com/alexrudall/ruby-openai>.
-
-This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/alexrudall/ruby-openai/blob/main/CODE_OF_CONDUCT.md).
+This project is mainly intended for a small patch for our team until we can migrate to the official OpenAI Ruby client: https://github.com/openai/openai-ruby
 
 ## Reporting Issues
 

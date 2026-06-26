@@ -1,7 +1,11 @@
 # Ruby OpenAI
 
+Fork of https://github.com/alexrudall/ruby-openai
+
+This project is mainly intended for a small patch for our team until we can migrate to the official OpenAI Ruby client: https://github.com/openai/openai-ruby
+
 [![Gem Version](https://img.shields.io/gem/v/ruby-openai.svg)](https://rubygems.org/gems/ruby-openai)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/alexrudall/ruby-openai/blob/main/LICENSE.txt)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Shopify/ruby-openai/blob/main/LICENSE.txt)
 [![CircleCI Build Status](https://circleci.com/gh/alexrudall/ruby-openai.svg?style=shield)](https://circleci.com/gh/alexrudall/ruby-openai)
 
 Use the [OpenAI API](https://openai.com/blog/openai-api/) with Ruby! 🤖❤️
@@ -1576,7 +1580,7 @@ Take a deep breath. You might need a drink for this one.
 
 It's possible for OpenAI to share what chunks it used in its internal RAG Pipeline to create its filesearch results.
 
-An example spec can be found [here](https://github.com/alexrudall/ruby-openai/blob/main/spec/openai/client/assistant_file_search_spec.rb) that does this, just so you know it's possible.
+An example spec can be found [here](https://github.com/Shopify/ruby-openai/blob/main/spec/openai/client/assistant_file_search_spec.rb) that does this, just so you know it's possible.
 
 Here's how to get the chunks used in a file search. In this example I'm using [this file](https://css4.pub/2015/textbook/somatosensory.pdf):
 
@@ -1975,7 +1979,7 @@ Release notes are published through GitHub Releases, git tags, RubyGems, and `CH
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at <https://github.com/alexrudall/ruby-openai>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/alexrudall/ruby-openai/blob/main/CODE_OF_CONDUCT.md).
+Adhere to the [code of conduct](https://github.com/Shopify/ruby-openai/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -1983,4 +1987,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Ruby OpenAI project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/alexrudall/ruby-openai/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Ruby OpenAI project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/Shopify/ruby-openai/blob/main/CODE_OF_CONDUCT.md).
