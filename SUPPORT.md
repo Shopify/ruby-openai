@@ -35,9 +35,9 @@ Shorter timelines may be necessary when an upstream API change, dependency issue
 
 Release information is published through:
 
-- GitHub Releases and git tags: <https://github.com/alexrudall/ruby-openai/releases>
+- GitHub Releases and git tags: <https://github.com/Shopify/ruby-openai/releases>
 - RubyGems: <https://rubygems.org/gems/ruby-openai>
-- `CHANGELOG.md`: <https://github.com/alexrudall/ruby-openai/blob/main/CHANGELOG.md>
+- `CHANGELOG.md`: <https://github.com/Shopify/ruby-openai/blob/main/CHANGELOG.md>
 
 Major releases, security releases, and end-of-life notices may also be shared through the community channels linked from the README.
 

@@ -10,7 +10,7 @@ Security fixes target the supported release line documented in `SUPPORT.md`.
 
 Please do not create a public GitHub issue for a suspected vulnerability.
 
-Use GitHub private vulnerability reporting instead: open the repository [Security tab](https://github.com/alexrudall/ruby-openai/security) and click "Report a vulnerability".
+Use GitHub private vulnerability reporting instead: open the repository [Security tab](https://github.com/Shopify/ruby-openai/security) and click "Report a vulnerability".
 
 Helpful reports include:
 
