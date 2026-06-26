@@ -6,7 +6,7 @@ This project is mainly intended for a small patch for our team until we can migr
 
 [![Gem Version](https://img.shields.io/gem/v/ruby-openai.svg)](https://rubygems.org/gems/ruby-openai)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Shopify/ruby-openai/blob/main/LICENSE.txt)
-[![CircleCI Build Status](https://circleci.com/gh/alexrudall/ruby-openai.svg?style=shield)](https://circleci.com/gh/alexrudall/ruby-openai)
+[![CI](https://github.com/Shopify/ruby-openai/actions/workflows/ci.yml/badge.svg)](https://github.com/Shopify/ruby-openai/actions/workflows/ci.yml)
 
 Use the [OpenAI API](https://openai.com/blog/openai-api/) with Ruby! 🤖❤️
 
