@@ -1,0 +1,71 @@
+RSpec.describe ShopifAi do
+  it "has a version number" do
+    expect(ShopifAi::VERSION).not_to be nil
+  end
+
+  describe "#configure" do
+    let(:access_token) { "abc123" }
+    let(:api_version) { "v2" }
+    let(:organization_id) { "def456" }
+    let(:custom_uri_base) { "ghi789" }
+    let(:custom_request_timeout) { 25 }
+    let(:extra_headers) { { "User-Agent" => "OpenAI Ruby Gem #{ShopifAi::VERSION}" } }
+
+    before do
+      ShopifAi.configure do |config|
+        config.access_token = access_token
+        config.api_version = api_version
+        config.organization_id = organization_id
+        config.extra_headers = extra_headers
+      end
+    end
+
+    it "returns the config" do
+      expect(ShopifAi.configuration.access_token).to eq(access_token)
+      expect(ShopifAi.configuration.api_version).to eq(api_version)
+      expect(ShopifAi.configuration.organization_id).to eq(organization_id)
+      expect(ShopifAi.configuration.uri_base).to eq("https://api.openai.com/")
+      expect(ShopifAi.configuration.request_timeout).to eq(120)
+      expect(ShopifAi.configuration.extra_headers).to eq(extra_headers)
+    end
+
+    context "with custom timeout and uri base" do
+      before do
+        ShopifAi.configure do |config|
+          config.uri_base = custom_uri_base
+          config.request_timeout = custom_request_timeout
+        end
+      end
+
+      it "returns the config" do
+        expect(ShopifAi.configuration.access_token).to eq(access_token)
+        expect(ShopifAi.configuration.api_version).to eq(api_version)
+        expect(ShopifAi.configuration.organization_id).to eq(organization_id)
+        expect(ShopifAi.configuration.uri_base).to eq(custom_uri_base)
+        expect(ShopifAi.configuration.request_timeout).to eq(custom_request_timeout)
+        expect(ShopifAi.configuration.extra_headers).to eq(extra_headers)
+      end
+    end
+  end
+
+  describe "#rough_token_count" do
+    context "on a non-String" do
+      it "raises an error" do
+        expect { ShopifAi.rough_token_count([]) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "on the empty string" do
+      it "returns 0" do
+        expect(ShopifAi.rough_token_count("")).to eq(0)
+      end
+    end
+
+    context "on a string" do
+      let(:content) { "Red is my favorite color. Egg is not a necessary ingredient." }
+      it "estimates tokens" do
+        expect(ShopifAi.rough_token_count(content)).to eq(15)
+      end
+    end
+  end
+end

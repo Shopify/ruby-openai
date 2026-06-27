@@ -1,8 +1,8 @@
-require_relative "lib/openai/version"
+require_relative "lib/shopif_ai/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "ruby-openai"
-  spec.version       = OpenAI::VERSION
+  spec.version       = ShopifAi::VERSION
   spec.authors       = ["Alex"]
   spec.email         = ["alexrudall@users.noreply.github.com"]
 
