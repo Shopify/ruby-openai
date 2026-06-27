@@ -1,0 +1,66 @@
+RSpec.describe ShopifAi::Client do
+  describe "#run_steps" do
+    let(:thread_id) do
+      VCR.use_cassette("#{cassette} thread setup") do
+        ShopifAi::Client.new.threads.create(parameters: {})["id"]
+      end
+    end
+    let(:assistant_id) do
+      VCR.use_cassette("#{cassette} assistant setup") do
+        ShopifAi::Client.new.assistants.create(
+          parameters: {
+            model: "gpt-4",
+            name: "OpenAI-Ruby test assistant",
+            instructions: "When asked a question, write and run Ruby code to answer the question"
+          }
+        )["id"]
+      end
+    end
+    let(:run_id) do
+      VCR.use_cassette("#{cassette} run setup") do
+        ShopifAi::Client.new.runs.create(
+          thread_id: thread_id,
+          parameters: {
+            assistant_id: assistant_id
+          }
+        )["id"]
+      end
+    end
+
+    describe "#list" do
+      let(:cassette) { "run_steps list" }
+      let(:response) do
+        ShopifAi::Client.new.run_steps.list(
+          thread_id: thread_id,
+          run_id: run_id,
+          parameters: { order: "asc" }
+        )
+      end
+
+      it "succeeds" do
+        VCR.use_cassette(cassette) do
+          expect(response["object"]).to eq("list")
+        end
+      end
+    end
+
+    describe "#retrieve" do
+      let(:cassette) { "run_steps retrieve" }
+      let(:response) do
+        ShopifAi::Client.new.run_steps.retrieve(
+          thread_id: thread_id,
+          run_id: run_id,
+          id: "step_123"
+        )
+      end
+
+      it "returns the correct error" do
+        VCR.use_cassette(cassette) do
+          response
+        rescue StandardError => e
+          expect(e.response.dig(:body, "error", "message")).to include("No run step found")
+        end
+      end
+    end
+  end
+end
