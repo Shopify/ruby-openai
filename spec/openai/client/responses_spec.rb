@@ -1,14 +1,19 @@
 RSpec.describe OpenAI::Client do
   describe "#responses" do
+    let(:custom_headers) { { "X-Custom-Header" => "custom-value" } }
+    let(:extra_headers) { {} }
+
     describe "#create", :vcr do
+      let(:client) { OpenAI::Client.new({ uri_base: uri_base }) }
       let(:model) { "gpt-4o" }
       let(:input) { "Hello!" }
       let(:stream) { false }
       let(:uri_base) { nil }
       let(:parameters) { { model: model, input: input, stream: stream } }
       let(:response) do
-        OpenAI::Client.new({ uri_base: uri_base }).responses.create(
-          parameters: parameters
+        client.responses.create(
+          parameters: parameters,
+          extra_headers: extra_headers
         )
       end
       let(:content) { response.dig("output", 0, "content", 0, "text") }
@@ -17,6 +22,20 @@ RSpec.describe OpenAI::Client do
       it "succeeds" do
         VCR.use_cassette(cassette) do
           expect(content.split.empty?).to eq(false)
+        end
+      end
+
+      context "with extra_headers" do
+        let(:extra_headers) { custom_headers }
+
+        it "passes extra_headers to the request" do
+          expect(client).to receive(:json_post).with(
+            path: "/responses",
+            parameters: parameters,
+            extra_headers: custom_headers
+          ).and_return({ "ok" => true })
+
+          expect(response).to eq({ "ok" => true })
         end
       end
 
@@ -153,6 +172,7 @@ RSpec.describe OpenAI::Client do
     end
 
     describe "#retrieve" do
+      let(:client) { OpenAI::Client.new }
       let(:model) { "gpt-4o" }
       let(:response_id) do
         VCR.use_cassette("responses retrieve setup") do
@@ -164,8 +184,13 @@ RSpec.describe OpenAI::Client do
           )["id"]
         end
       end
-      let(:response) { OpenAI::Client.new.responses.retrieve(response_id: response_id) }
       let(:cassette) { "responses retrieve" }
+      let(:response) do
+        client.responses.retrieve(
+          response_id: response_id,
+          extra_headers: extra_headers
+        )
+      end
 
       it "succeeds" do
         VCR.use_cassette(cassette) do
@@ -173,9 +198,24 @@ RSpec.describe OpenAI::Client do
           expect(response["id"]).to eq(response_id)
         end
       end
+
+      context "with extra_headers" do
+        let(:extra_headers) { custom_headers }
+        let(:response_id) { "resp_123" }
+
+        it "passes extra_headers to the request" do
+          expect(client).to receive(:get).with(
+            path: "/responses/#{response_id}",
+            extra_headers: custom_headers
+          ).and_return({ "id" => response_id })
+
+          expect(response["id"]).to eq(response_id)
+        end
+      end
     end
 
     describe "#delete" do
+      let(:client) { OpenAI::Client.new }
       let(:model) { "gpt-4o" }
       let(:response_id) do
         VCR.use_cassette("responses delete setup") do
@@ -187,8 +227,13 @@ RSpec.describe OpenAI::Client do
           )["id"]
         end
       end
-      let(:response) { OpenAI::Client.new.responses.delete(response_id: response_id) }
       let(:cassette) { "responses delete" }
+      let(:response) do
+        client.responses.delete(
+          response_id: response_id,
+          extra_headers: extra_headers
+        )
+      end
 
       it "succeeds" do
         VCR.use_cassette(cassette) do
@@ -196,10 +241,26 @@ RSpec.describe OpenAI::Client do
           expect(response["id"]).to eq(response_id)
         end
       end
+
+      context "with extra_headers" do
+        let(:extra_headers) { custom_headers }
+        let(:response_id) { "resp_123" }
+
+        it "passes extra_headers to the request" do
+          expect(client).to receive(:delete).with(
+            path: "/responses/#{response_id}",
+            extra_headers: custom_headers
+          ).and_return({ "deleted" => true })
+
+          expect(response["deleted"]).to eq(true)
+        end
+      end
     end
 
     describe "#input_items" do
+      let(:client) { OpenAI::Client.new }
       let(:model) { "gpt-4o" }
+      let(:parameters) { {} }
       let(:response_id) do
         VCR.use_cassette("responses input_items setup") do
           OpenAI::Client.new.responses.create(
@@ -210,13 +271,34 @@ RSpec.describe OpenAI::Client do
           )["id"]
         end
       end
-      let(:response) { OpenAI::Client.new.responses.input_items(response_id: response_id) }
       let(:cassette) { "responses input_items" }
+      let(:response) do
+        client.responses.input_items(
+          response_id: response_id,
+          parameters: parameters,
+          extra_headers: extra_headers
+        )
+      end
 
       it "succeeds" do
         VCR.use_cassette(cassette) do
           expect(response["object"]).to eq("list")
           expect(response["data"]).to be_an(Array)
+        end
+      end
+
+      context "with extra_headers" do
+        let(:extra_headers) { custom_headers }
+        let(:response_id) { "resp_123" }
+
+        it "passes extra_headers to the request" do
+          expect(client).to receive(:get).with(
+            path: "/responses/#{response_id}/input_items",
+            parameters: parameters,
+            extra_headers: custom_headers
+          ).and_return({ "data" => [] })
+
+          expect(response["data"]).to eq([])
         end
       end
     end
