@@ -1,5 +1,8 @@
-## All Submissions:
+* [ ] Followed the guidelines in [Contributing document](../blob/main/CONTRIBUTING.md)
+* [ ] There are not other open [Pull Requests](../pulls) for the same update/change
 
-* [ ] Have you followed the guidelines in our [Contributing document](../blob/main/CONTRIBUTING.md)?
-* [ ] Have you checked to ensure there aren't other open [Pull Requests](../pulls) for the same update/change?
-* [ ] Have you added an explanation of what your changes do and why you'd like us to include them?
+## Summary
+<!-- TODO -->
+
+## Reason for Change
+<!-- TODO -->
