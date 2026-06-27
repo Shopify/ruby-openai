@@ -143,7 +143,7 @@ gem install ruby-openai
 and require with:
 
 ```ruby
-require "openai"
+require "shopif_ai"
 ```
 
 ## How to use
@@ -156,7 +156,7 @@ require "openai"
 For a quick test you can pass your token directly to a new client:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "access_token_goes_here",
   log_errors: true # Highly recommended in development, so you can see what errors OpenAI is returning. Not recommended in production because it could leak private data to your logs.
 )
@@ -164,10 +164,10 @@ client = OpenAI::Client.new(
 
 ### With Config
 
-For a more robust setup, you can configure the gem with your API keys, for example in an `openai.rb` initializer file. Never hardcode secrets into your codebase - instead use something like [dotenv](https://github.com/motdotla/dotenv) to pass the keys safely into your environments.
+For a more robust setup, you can configure the gem with your API keys, for example in a `shopif_ai.rb` initializer file. Never hardcode secrets into your codebase - instead use something like [dotenv](https://github.com/motdotla/dotenv) to pass the keys safely into your environments.
 
 ```ruby
-OpenAI.configure do |config|
+ShopifAi.configure do |config|
   config.access_token = ENV.fetch("OPENAI_ACCESS_TOKEN")
   config.admin_token = ENV.fetch("OPENAI_ADMIN_TOKEN") # Optional, used for admin endpoints, created here: https://platform.openai.com/settings/organization/admin-keys
   config.organization_id = ENV.fetch("OPENAI_ORGANIZATION_ID") # Optional
@@ -178,13 +178,13 @@ end
 Then you can create a client like this:
 
 ```ruby
-client = OpenAI::Client.new
+client = ShopifAi::Client.new
 ```
 
-You can still override the config defaults when making new clients; any options not included will fall back to any global config set with OpenAI.configure. e.g. in this example the organization_id, request_timeout, etc. will fallback to any set globally using OpenAI.configure, with only the access_token and admin_token overridden:
+You can still override the config defaults when making new clients; any options not included will fall back to any global config set with ShopifAi.configure. e.g. in this example the organization_id, request_timeout, etc. will fallback to any set globally using ShopifAi.configure, with only the access_token and admin_token overridden:
 
 ```ruby
-client = OpenAI::Client.new(access_token: "access_token_goes_here", admin_token: "admin_token_goes_here")
+client = ShopifAi::Client.new(access_token: "access_token_goes_here", admin_token: "admin_token_goes_here")
 ```
 
 #### Custom timeout or base URI
@@ -194,7 +194,7 @@ client = OpenAI::Client.new(access_token: "access_token_goes_here", admin_token:
 - You can also add arbitrary other headers e.g. for [openai-caching-proxy-worker](https://github.com/6/openai-caching-proxy-worker), eg.:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "access_token_goes_here",
   uri_base: "https://oai.hconeai.com/",
   request_timeout: 240,
@@ -210,7 +210,7 @@ client = OpenAI::Client.new(
 or when configuring the gem:
 
 ```ruby
-OpenAI.configure do |config|
+ShopifAi.configure do |config|
   config.access_token = ENV.fetch("OPENAI_ACCESS_TOKEN")
   config.admin_token = ENV.fetch("OPENAI_ADMIN_TOKEN") # Optional, used for admin endpoints, created here: https://platform.openai.com/settings/organization/admin-keys
   config.organization_id = ENV.fetch("OPENAI_ORGANIZATION_ID") # Optional
@@ -227,10 +227,10 @@ end
 
 #### Extra Headers per Client
 
-You can dynamically pass headers per client object, which will be merged with any headers set globally with OpenAI.configure:
+You can dynamically pass headers per client object, which will be merged with any headers set globally with ShopifAi.configure:
 
 ```ruby
-client = OpenAI::Client.new(access_token: "access_token_goes_here")
+client = ShopifAi::Client.new(access_token: "access_token_goes_here")
 client.add_headers("X-Proxy-TTL" => "43200")
 ```
 
@@ -243,7 +243,7 @@ By default, `ruby-openai` does not log any `Faraday::Error`s encountered while e
 If you would like to enable this functionality, you can set `log_errors` to `true` when configuring the client:
 
 ```ruby
-client = OpenAI::Client.new(log_errors: true)
+client = ShopifAi::Client.new(log_errors: true)
 ```
 
 ##### Faraday middleware
@@ -253,7 +253,7 @@ You can pass [Faraday middleware](https://lostisland.github.io/faraday/#/middlew
 - To enable verbose logging with Ruby's [Logger](https://ruby-doc.org/3.2.2/stdlibs/logger/Logger.html):
 
 ```ruby
-client = OpenAI::Client.new do |f|
+client = ShopifAi::Client.new do |f|
   f.response :logger, Logger.new($stdout), bodies: true
 end
 ```
@@ -261,7 +261,7 @@ end
 - To add a web debugging proxy like [Charles](https://www.charlesproxy.com/documentation/welcome/):
 
 ```ruby
-  client = OpenAI::Client.new do |f|
+  client = ShopifAi::Client.new do |f|
     f.proxy = { uri: "http://localhost:8888" }
   end
 ```
@@ -270,7 +270,7 @@ end
 To use the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/) API, you can configure the gem like this:
 
 ```ruby
-OpenAI.configure do |config|
+ShopifAi.configure do |config|
   config.access_token = ENV.fetch("AZURE_OPENAI_API_KEY")
   config.uri_base = ENV.fetch("AZURE_OPENAI_URI")
   config.api_type = :azure
@@ -285,7 +285,7 @@ where `AZURE_OPENAI_URI` is e.g. `https://custom-domain.openai.azure.com/openai/
 [Deepseek](https://api-docs.deepseek.com/) is compatible with the OpenAI chat API. Get an access token from [here](https://platform.deepseek.com/api_keys), then:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "deepseek_access_token_goes_here",
   uri_base: "https://api.deepseek.com/"
 )
@@ -317,7 +317,7 @@ ollama pull llama3:latest # In new terminal tab.
 Create a client using your Ollama server and the pulled model, and stream a conversation for free:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   uri_base: "http://localhost:11434"
 )
 
@@ -340,7 +340,7 @@ client.chat(
 [Groq API Chat](https://console.groq.com/docs/quickstart) is broadly compatible with the OpenAI API, with a [few minor differences](https://console.groq.com/docs/openai). Get an access token from [here](https://console.groq.com/keys), then:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "groq_access_token_goes_here",
   uri_base: "https://api.groq.com/openai"
 )
@@ -362,7 +362,7 @@ client.chat(
 [Gemini API Chat](https://ai.google.dev/gemini-api/docs/openai) is also broadly compatible with the OpenAI API, and [currently in beta](https://ai.google.dev/gemini-api/docs/openai#current-limitations). Get an access token from [here](https://aistudio.google.com/app/apikey), then:
 
 ```ruby
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "gemini_access_token_goes_here",
   uri_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
 )
@@ -388,7 +388,7 @@ OpenAI parses prompt text into [tokens](https://help.openai.com/en/articles/4936
 To estimate the token-count of your text:
 
 ```ruby
-OpenAI.rough_token_count("Your text")
+ShopifAi.rough_token_count("Your text")
 ```
 
 If you need a more accurate count, try [tiktoken_ruby](https://github.com/IAPark/tiktoken_ruby).
@@ -1463,10 +1463,10 @@ thread_id = response['thread_id']
 You can include images in a thread and they will be described & read by the LLM. In this example I'm using [this file](https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png):
 
 ```ruby
-require "openai"
+require "shopif_ai"
 
 # Make a client
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "access_token_goes_here",
   log_errors: true # Don't log errors in production.
 )
@@ -1580,15 +1580,15 @@ Take a deep breath. You might need a drink for this one.
 
 It's possible for OpenAI to share what chunks it used in its internal RAG Pipeline to create its filesearch results.
 
-An example spec can be found [here](https://github.com/Shopify/ruby-openai/blob/main/spec/openai/client/assistant_file_search_spec.rb) that does this, just so you know it's possible.
+An example spec can be found [here](https://github.com/Shopify/ruby-openai/blob/main/spec/shopif_ai/client/assistant_file_search_spec.rb) that does this, just so you know it's possible.
 
 Here's how to get the chunks used in a file search. In this example I'm using [this file](https://css4.pub/2015/textbook/somatosensory.pdf):
 
 ```ruby
-require "openai"
+require "shopif_ai"
 
 # Make a client
-client = OpenAI::Client.new(
+client = ShopifAi::Client.new(
   access_token: "access_token_goes_here",
   log_errors: true # Don't log errors in production.
 )
@@ -1742,7 +1742,7 @@ puts response.dig("data", 0, "url")
 You can also upload arrays of images, eg.
 
 ```ruby
-  client = OpenAI::Client.new
+  client = ShopifAi::Client.new
   response = client.images.edit(
     parameters: {
       model: "gpt-image-1",
@@ -1879,13 +1879,13 @@ The Usage API provides information about the cost of various OpenAI services wit
 To use Admin APIs like Usage, you need to set an OPENAI_ADMIN_TOKEN, which can be generated [here](https://platform.openai.com/settings/organization/admin-keys).
 
 ```ruby
-OpenAI.configure do |config|
+ShopifAi.configure do |config|
   config.admin_token = ENV.fetch("OPENAI_ADMIN_TOKEN")
 end
 
 # or
 
-client = OpenAI::Client.new(admin_token: "123abc")
+client = ShopifAi::Client.new(admin_token: "123abc")
 ```
 
 You can retrieve usage data for different endpoints and time periods:
@@ -1938,7 +1938,7 @@ HTTP errors can be caught like this:
 
 ```ruby
 begin
-  OpenAI::Client.new.models.retrieve(id: "gpt-4o")
+  ShopifAi::Client.new.models.retrieve(id: "gpt-4o")
 rescue Faraday::Error => e
   raise "Got a Faraday error: #{e}"
 end
@@ -1958,7 +1958,7 @@ To run all tests, execute the command `bundle exec rake`, which will also run th
 ### To check for deprecations
 
 ```
-bundle exec ruby -e "Warning[:deprecated] = true; require 'rspec'; exit RSpec::Core::Runner.run(['spec/openai/client/http_spec.rb:25'])"
+bundle exec ruby -e "Warning[:deprecated] = true; require 'rspec'; exit RSpec::Core::Runner.run(['spec/shopif_ai/client/http_spec.rb:25'])"
 ```
 
 ## Release

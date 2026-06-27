@@ -1,6 +1,6 @@
 require "bundler/setup"
 require "dotenv/load"
-require "openai"
+require "shopif_ai"
 require "vcr"
 require "byebug"
 
@@ -18,7 +18,7 @@ VCR.configure do |c|
 
   %w[ACCESS_TOKEN ADMIN_TOKEN ORGANIZATION_ID USER_ID].each do |key|
     c.filter_sensitive_data("<OPENAI_#{key}>") do
-      key == "USER_ID" ? ENV.fetch("OPENAI_#{key}", nil) : OpenAI.configuration.send(key.downcase)
+      key == "USER_ID" ? ENV.fetch("OPENAI_#{key}", nil) : ShopifAi.configuration.send(key.downcase)
     end
   end
 end
@@ -43,7 +43,7 @@ RSpec.configure do |c|
   end
 
   c.before(:all) do
-    OpenAI.configure do |config|
+    ShopifAi.configure do |config|
       config.access_token = ENV.fetch("OPENAI_ACCESS_TOKEN", "dummy-token")
       config.admin_token = ENV.fetch("OPENAI_ADMIN_TOKEN", "dummy-token")
       config.organization_id = ENV.fetch("OPENAI_ORGANIZATION_ID", nil)
