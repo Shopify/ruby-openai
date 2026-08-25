@@ -3,7 +3,36 @@ module ShopifAi
   class Client
     include ShopifAi::HTTP
 
-    SENSITIVE_ATTRIBUTES = %i[@access_token @admin_token @organization_id @extra_headers].freeze
+    SENSITIVE_ATTRIBUTES = %i[
+      @access_token
+      @admin_token
+      @conn
+      @extra_headers
+      @multipart_conn
+      @organization_id
+    ].freeze
+    MEMOIZED_ATTRIBUTES = %i[
+      @assistants
+      @audio
+      @batches
+      @conn
+      @conversations
+      @files
+      @finetunes
+      @images
+      @messages
+      @models
+      @multipart_conn
+      @realtime
+      @responses
+      @run_steps
+      @runs
+      @threads
+      @usage
+      @vector_store_file_batches
+      @vector_store_files
+      @vector_stores
+    ].freeze
     CONFIG_KEYS = %i[access_token admin_token api_type api_version extra_headers
                      log_errors organization_id request_timeout uri_base].freeze
     attr_reader(*CONFIG_KEYS, :faraday_middleware)
@@ -19,6 +48,7 @@ module ShopifAi
         )
       end
       @faraday_middleware = faraday_middleware
+      @connection_mutex = Mutex.new
     end
 
     def chat(parameters: {}, extra_headers: {})
@@ -138,6 +168,16 @@ module ShopifAi
       end
 
       "#<#{self.class}:#{object_id} #{vars.join(', ')}>"
+    end
+
+    private
+
+    def initialize_dup(_original)
+      super
+      MEMOIZED_ATTRIBUTES.each do |attribute|
+        remove_instance_variable(attribute) if instance_variable_defined?(attribute)
+      end
+      @connection_mutex = Mutex.new
     end
   end
 end

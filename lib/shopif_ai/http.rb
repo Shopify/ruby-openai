@@ -56,6 +56,19 @@ module ShopifAi
     end
 
     def conn(multipart: false)
+      connection = multipart ? @multipart_conn : @conn
+      return connection if connection
+
+      @connection_mutex.synchronize do
+        if multipart
+          @multipart_conn ||= build_connection(multipart: true)
+        else
+          @conn ||= build_connection
+        end
+      end
+    end
+
+    def build_connection(multipart: false)
       connection = Faraday.new do |f|
         f.options[:timeout] = @request_timeout
         f.request(:multipart) if multipart
@@ -65,6 +78,8 @@ module ShopifAi
       end
 
       @faraday_middleware&.call(connection)
+      # Faraday builds middleware lazily without synchronization, so publish a fully built stack.
+      connection.builder.app
 
       connection
     end

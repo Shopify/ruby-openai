@@ -126,6 +126,28 @@ RSpec.describe ShopifAi::Client do
         expect(admin_client.access_token).to eq(admin_token)
         expect(client.access_token).not_to eq(admin_token) # Original unchanged
       end
+
+      it "rebuilds memoized endpoints for the admin client" do
+        authorization_headers = []
+        client = ShopifAi::Client.new(
+          access_token: "user-token",
+          admin_token: admin_token,
+          api_version: "",
+          uri_base: "https://example.test"
+        ) do |faraday|
+          faraday.adapter :test do |stubs|
+            stubs.get("/threads/thread-id") do |env|
+              authorization_headers << env.request_headers["Authorization"]
+              [200, { "Content-Type" => "application/json" }, "{}"]
+            end
+          end
+        end
+        client.threads
+
+        client.admin.threads.retrieve(id: "thread-id")
+
+        expect(authorization_headers).to eq(["Bearer #{admin_token}"])
+      end
     end
 
     context "when using both beta and admin" do
@@ -155,6 +177,54 @@ RSpec.describe ShopifAi::Client do
     end
   end
 
+  context "when building HTTP connections" do
+    let(:client) { ShopifAi::Client.new }
+
+    it "reuses normal and multipart connections" do
+      connection = client.send(:conn)
+      multipart_connection = client.send(:conn, multipart: true)
+
+      expect(client.send(:conn)).to equal(connection)
+      expect(client.send(:conn, multipart: true)).to equal(multipart_connection)
+      expect(multipart_connection).not_to equal(connection)
+    end
+
+    it "builds the middleware stack once under concurrent first requests" do
+      build_count = 0
+      count_mutex = Mutex.new
+      middleware_initialize = Faraday::Middleware.instance_method(:initialize)
+      middleware_class = Class.new(Faraday::Middleware) do
+        define_method(:initialize) do |app|
+          count_mutex.synchronize { build_count += 1 }
+          sleep 0.01
+          middleware_initialize.bind(self).call(app)
+        end
+      end
+      concurrent_client = ShopifAi::Client.new(uri_base: "https://example.test") do |faraday|
+        faraday.use middleware_class
+        faraday.adapter :test do |stubs|
+          stubs.get("/v1/ping") { [200, { "Content-Type" => "application/json" }, "{}"] }
+        end
+      end
+
+      responses = Array.new(8) do
+        Thread.new { concurrent_client.send(:get, path: "/ping") }
+      end.map(&:value)
+
+      expect(responses).to all(eq({}))
+      expect(build_count).to eq(1)
+    end
+
+    it "does not share connections with duplicated clients" do
+      connection = client.send(:conn)
+      multipart_connection = client.send(:conn, multipart: true)
+      duplicate = client.dup
+
+      expect(duplicate.send(:conn)).not_to equal(connection)
+      expect(duplicate.send(:conn, multipart: true)).not_to equal(multipart_connection)
+    end
+  end
+
   context "with a block" do
     let(:client) do
       ShopifAi::Client.new do |client|
@@ -162,15 +232,18 @@ RSpec.describe ShopifAi::Client do
       end
     end
 
-    it "sets the logger" do
-      connection = Faraday.new
-      client.faraday_middleware.call(connection)
+    it "applies the configured middleware to both connections" do
+      connection = client.send(:conn)
+      multipart_connection = client.send(:conn, multipart: true)
+
       expect(connection.builder.handlers).to include Faraday::Response::Logger
+      expect(multipart_connection.builder.handlers).to include Faraday::Response::Logger
     end
   end
 
   context "when calling inspect" do
     let(:api_key) { "sk-123456789" }
+    let(:connection_header) { "Bearer connection-secret" }
     let(:organization_id) { "org-123456789" }
     let(:extra_headers) { { "Other-Auth": "key-123456789" } }
     let(:uri_base) { "https://example.com/" }
@@ -182,13 +255,18 @@ RSpec.describe ShopifAi::Client do
         access_token: api_key,
         organization_id: organization_id,
         extra_headers: extra_headers
-      )
+      ) do |connection|
+        connection.headers["Authorization"] = connection_header
+      end
     end
 
     it "does not expose sensitive information" do
+      client.send(:conn)
+      client.send(:conn, multipart: true)
       expect(client.inspect).not_to include(api_key)
       expect(client.inspect).not_to include(organization_id)
       expect(client.inspect).not_to include(extra_headers[:"Other-Auth"])
+      expect(client.inspect).not_to include(connection_header)
     end
 
     it "does expose non-sensitive information" do
