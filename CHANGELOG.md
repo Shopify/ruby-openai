@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Reuse normal and multipart Faraday connections across requests, adapted from [@khasinski](https://github.com/khasinski)'s [upstream work](https://github.com/alexrudall/ruby-openai/pull/636).
+
 ## [9.0.0] - 2026-06-27
 
 ### Changed
